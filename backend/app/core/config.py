@@ -226,6 +226,11 @@ class Settings(BaseSettings):
         "RERANKER_CROSS_ENCODER_MODEL", "BAAI/bge-reranker-base"
     )
     RERANKER_BATCH_SIZE: int = int(os.getenv("RERANKER_BATCH_SIZE", "32"))
+    # [ArchRAG] Web Search Backend Selection: tavily | exa | disabled
+    WEB_SEARCH_ENABLED: bool = (
+        os.getenv("WEB_SEARCH_ENABLED", "false").lower() == "true"
+    )
+    WEB_SEARCH_BACKEND: str = os.getenv("WEB_SEARCH_BACKEND", "tavily")
     # Retrieval performance knobs
     RAG_RECALL_WINDOW: int = int(os.getenv("RAG_RECALL_WINDOW", "100"))
     RAG_RERANK_CANDIDATE_K: int = int(os.getenv("RAG_RERANK_CANDIDATE_K", "12"))

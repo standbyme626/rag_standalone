@@ -244,25 +244,28 @@
 
 ### 3.2 GraphRAG 增强
 
-- [ ] **3.2.1** 实体合并逻辑
+- [x] ~~**3.2.1**~~ 实体合并逻辑
   - 来源：ragflow `rag/graphrag/general/extractor.py`
   - LLM 驱动 Light/General 双模式
   - 同名实体合并（SEP 分隔描述）+ 描述摘要压缩（512 token 阈）
-- [ ] **3.2.2** Leiden 社区检测
+- [x] ~~**3.2.2**~~ Leiden 社区检测
   - 来源：ragflow `rag/graphrag/general/leiden.py`
   - 层级社区划分
-- [ ] **3.2.3** 社区报告生成
+- [x] ~~**3.2.3**~~ 社区报告生成
   - 来源：ragflow `rag/graphrag/general/community_reports_extractor.py`
-- [ ] **3.2.4** 图检索增强
+- [x] ~~**3.2.4**~~ 图检索增强
   - PageRank + 相似度融合 + N 跳路径
   - 来源：ragflow `rag/graphrag/search.py`
-- [ ] **3.2.5** 实体消歧
+- [x] ~~**3.2.5**~~ 实体消歧
   - 来源：ragflow `rag/graphrag/entity_resolution.py`
   - editdistance 预筛 + LLM 批量决议
 
-**完成时间**：____  **修改记录**：
+**完成时间**：2026-04-02  **修改记录**：
 
 | 日期 | 文件 | 说明 |
+|------|------|------|
+| 2026-04-02 | `backend/app/rag/graphrag.py` | GraphIndex + GraphExtractor + Leiden + CommunityReporter + entity_resolution (29 测试) |
+| 2026-04-02 | `backend/tests/test_graphrag.py` | 29 个新测试 |
 |------|------|------|
 
 ---

@@ -5,5 +5,6 @@ from .semantic import SemanticChunker  # noqa: F401
 from .document_aware import DocumentAwareChunker  # noqa: F401
 from .table_aware import TableAwareChunker  # noqa: F401
 from .legal import LegalChunker  # noqa: F401
+from .chonkie import ChonkieChunker  # noqa: F401
 
 __all__ = ["BaseChunker", "register_chunker", "get_chunker"]

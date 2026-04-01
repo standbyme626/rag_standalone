@@ -144,21 +144,25 @@
 
 ### 2.2 RAPTOR 层次检索
 
-- [ ] **2.2.1** 实现 RAPTOR
+- [x] ~~**2.2.1**~~ 实现 RAPTOR
   - 来源：ragflow `rag/raptor.py`
   - UMAP 降维 + GMM 聚类（BIC 自动定簇数）
   - 每层 LLM 递归摘要
-- [ ] **2.2.2** 替换现有 hierarchical_index.py
+- [ ] ~~**2.2.2**~~ 替换现有 hierarchical_index.py
   - 现方案是规则式 3 级，RAPTOR 是算法式多层
   - 保留现方案作为 fallback (`--raptor disabled`)
-- [ ] **2.2.3** HierarchicalMerger 吸收
-  - 来源：ragflow `rag/flow/hierarchical_merger/hierarchical_merger.py`
+- [ ] ~~**2.2.3**~~ HierarchicalMerger 吸收
+  - 来源：ragflow `rag/flow/hierarchical/merger/hierarchical_merger.py`
   - Regex 匹配层级，树状合并 chunk
 
-**完成时间**：____  **修改记录**：
+**完成时间**：2026-04-01  **修改记录**：
 
 | 日期 | 文件 | 说明 |
 |------|------|------|
+| 2026-04-01 | `backend/app/rag/raptor.py` | Raptor 编排器 (`__call__`) |
+| 2026-04-01 | `backend/tests/test_raptor.py` | 10 个新测试 |
+
+---
 
 ---
 

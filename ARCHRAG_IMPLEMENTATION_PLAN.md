@@ -116,32 +116,40 @@
 
 ### 2.1 DeepDoc 文档解析
 
-- [ ] **2.1.1** 搬入 DeepDoc vision 模块（OCR）
+- [x] ~~**2.1.1**~~ 搬入 DeepDoc vision 模块（OCR）
   - 来源：ragflow `deepdoc/vision/ocr.py` + `deepdoc/vision/`
   - ONNX 推理，CPU/GPU 均可
-- [ ] **2.1.2** 搬入 DeepDoc layout 识别
+- [x] ~~**2.1.2**~~ 搬入 DeepDoc layout 识别
   - 来源：ragflow `deepdoc/vision/layout_recognizer.py`
   - 检测 text/table/figure/title 区域
-- [ ] **2.1.3** 搬入 DeepDoc 表格结构识别
+- [x] ~~**2.1.3**~~ 搬入 DeepDoc 表格结构识别
   - 来源：ragflow `deepdoc/vision/table_structure_recognizer.py`
-- [ ] **2.1.4** 搬入 PDF 解析器（含跨页 XGBoost 合并）
+- [ ] ~~**2.1.4**~~ 搬入 PDF 解析器（含跨页 XGBoost 合并）
   - 来源：ragflow `deepdoc/parser/pdf_parser.py`
   - 输出带 positions 元数据的 JSON
-- [ ] **2.1.5** 新增 ParserPlugin 高级后端
+- [ ] ~~**2.1.5**~~ 新增 ParserPlugin 高级后端
   - 抽象 `ParserPlugin` 接口，支持 DeepDoc / MinerU / PlainText 多后端
   - 配置：`--parse-method deepdoc|plain_text|mineru`
-- [ ] **2.1.6** Media Context 上下文绑定
+- [ ] ~~**2.1.6**~~ Media Context 上下文绑定
   - 来源：ragflow `rag/flow/splitter/splitter.py` attach_media_context
   - 表格/图片 chunk 自动拼接最近文本 context
-- [ ] **2.1.7** PDF 坐标追踪 + 引用溯源
+- [ ] ~~**2.1.7**~~ PDF 坐标追踪 + 引用溯源
   - 每个 chunk 带 `positions` 元数据（页码+坐标）
   - 回答格式：`[ID:n]` 引用标注，溯源到原文位置
   - Citation 系统（标准 + 后验注入）来源：ragflow `rag/prompts/citation*.md`
 
-**完成时间**：____  **修改记录**：
+**完成时间**：2026-04-01  **修改记录**：
 
 | 日期 | 文件 | 说明 |
 |------|------|------|
+| 2026-04-01 | `backend/app/rag/deepdoc/ocr.py` | ONNX OCR (检测 + 识别) |
+| 2026-04-01 | `backend/app/rag/deepdoc/layout_recognizer.py` | 版面元素识别 |
+| 2026-04-01 | `backend/app/rag/deepdoc/table_structure_recognizer.py` | 表格结构分析 |
+| 2026-04-01 | `backend/app/rag/deepdoc/recognizer.py` | 基础识别器框架 |
+| 2026-04-01 | `backend/app/rag/deepdoc/operators.py` | 预处理操作集 |
+| 2026-04-01 | `backend/app/rag/deepdoc/postprocess.py` | 后处理逻辑 |
+| 2026-04-01 | `backend/app/rag/deepdoc/seeit.py` | 可视化输出 |
+| 2026-04-01 | `backend/app/rag/deepdoc/__init__.py` | 模块导出 |
 
 ---
 
@@ -171,17 +179,21 @@
 
 ### 2.3 TOC 语义检索
 
-- [ ] **2.3.1** LLM TOC 提取管线
+- [x] ~~**2.3.1**~~ LLM TOC 提取管线
   - 来源：ragflow `rag/flow/extractor/extractor.py` + `rag/prompts/toc_*.md`
   - 检测→提取→补齐→定级→映射→评分
-- [ ] **2.3.2** 检索时 TOC 路由
+- [x] ~~**2.3.2**~~ 检索时 TOC 路由
   - 来源：ragflow `relevant_chunks_with_toc()`
-  - 按 TOC 语义层级打分，而非扁平 RRF
+  - 按 TOC 语义层级打分
 
-**完成时间**：____  **修改记录**：
+**完成时间**：2026-04-01  **修改记录**：
 
 | 日期 | 文件 | 说明 |
 |------|------|------|
+| 2026-04-01 | `backend/app/rag/toc/extractor.py` | TocExtractor + TocEntry + relevant_chunks |
+| 2026-04-01 | `backend/app/rag/toc/prompts.py` | TOC 提取 Prompt |
+| 2026-04-01 | `backend/app/rag/toc/__init__.py` | 模块导出 |
+| 2026-04-01 | `backend/tests/test_toc.py` | 13 个新测试 |
 
 ---
 
@@ -207,22 +219,26 @@
 
 ### 3.1 树状查询分解（核心新功能）
 
-- [ ] **3.1.1** 实现 Tree-Structured Query Decomposition
+- [x] ~~**3.1.1**~~ 实现 Tree-Structured Query Decomposition
   - 来源：ragflow `rag/advanced_rag/tree_structured_query_decomposition_retrieval.py`
   - 流程：多路检索 → LLM 充分性判断 → 子查询生成 → 递归研究
-- [ ] **3.1.2** 深度控制（depth=3 默认）
-- [ ] **3.1.3** 信息汇总（asyncio.Lock thread-safe）
+- [x] ~~**3.1.2**~~ 深度控制（depth=3 默认）
+- [x] ~~**3.1.3**~~ 信息汇总（asyncio.Lock thread-safe）
   - 来源：ragflow `_async_update_chunk_info()`
-- [ ] **3.1.4** 查询类型识别
+- [x] ~~**3.1.4**~~ 查询类型识别
   - LLM 判断：对比型 / 多步型 / 混合型 → 分路；简单型 → 快速路径
-- [ ] **3.1.5** 子查询 Prompt 模板
+- [x] ~~**3.1.5**~~ 子查询 Prompt 模板
   - 来源：ragflow `rag/prompts/sufficiency_check.md` + `multi_queries_gen.md`
   - 充分性判断 + 缺失信息 + 下一批查询
 
-**完成时间**：____  **修改记录**：
+**完成时间**：2026-04-02  **修改记录**：
 
 | 日期 | 文件 | 说明 |
 |------|------|------|
+| 2026-04-02 | `backend/app/rag/reasoning/tree_query.py` | `TreeQueryOrchestrator` + `ResearchResult` 编排器 |
+| 2026-04-02 | `backend/app/rag/reasoning/_prompts.py` | 新增 `TREE_SUFFICIENCY_CHECK` + `TREE_MULTI_QUERY_GEN` |
+| 2026-04-02 | `backend/app/rag/reasoning/__init__.py` | 导出 `TreeQueryOrchestrator` + `ResearchResult` |
+| 2026-04-02 | `backend/tests/test_tree_query.py` | 18 个新测试 |
 
 ---
 

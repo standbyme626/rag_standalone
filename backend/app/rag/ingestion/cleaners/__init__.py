@@ -1,11 +1,13 @@
 from .dedup import DedupCleaner  # noqa: F401
 from .noise_filter import NoiseFilterCleaner  # noqa: F401
 from .pii_redactor import PIIRedactorCleaner  # noqa: F401
+from .reflow import ReflowCleaner  # noqa: F401
 
 _CLEANER_MAP: dict[str, type] = {
     "dedup": DedupCleaner,
     "noise_filter": NoiseFilterCleaner,
     "pii_redactor": PIIRedactorCleaner,
+    "reflow": ReflowCleaner,
 }
 
 

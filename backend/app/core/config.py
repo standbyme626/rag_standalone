@@ -220,6 +220,12 @@ class Settings(BaseSettings):
         os.getenv("EMBEDDING_LOCAL_ENABLED", "false").lower() == "true"
     )
     RERANKER_DEVICE: str = os.getenv("RERANKER_DEVICE", "auto")
+    # [ArchRAG] Reranker Backend Selection: qwen | cross_encoder | openai_compatible
+    RERANKER_BACKEND: str = os.getenv("RERANKER_BACKEND", "qwen")
+    RERANKER_CROSS_ENCODER_MODEL: str = os.getenv(
+        "RERANKER_CROSS_ENCODER_MODEL", "BAAI/bge-reranker-base"
+    )
+    RERANKER_BATCH_SIZE: int = int(os.getenv("RERANKER_BATCH_SIZE", "32"))
     # Retrieval performance knobs
     RAG_RECALL_WINDOW: int = int(os.getenv("RAG_RECALL_WINDOW", "100"))
     RAG_RERANK_CANDIDATE_K: int = int(os.getenv("RAG_RERANK_CANDIDATE_K", "12"))

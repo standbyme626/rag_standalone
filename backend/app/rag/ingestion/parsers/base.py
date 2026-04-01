@@ -31,7 +31,8 @@ def register_parser(cls: type[BaseParser]) -> type[BaseParser]:
     """解析器注册装饰器。"""
     _PARSER_REGISTRY[cls.NAME] = cls
     for ext in cls.SUPPORTED_EXTENSIONS:
-        _EXT_INDEX[ext] = cls.NAME
+        # 不覆盖已有解析器 — 第一个注册的优先
+        _EXT_INDEX.setdefault(ext, cls.NAME)
     return cls
 
 

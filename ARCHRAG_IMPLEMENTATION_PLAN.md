@@ -10,22 +10,25 @@
 
 ### 1.1 重排器升级
 
-- [ ] **1.1.1** 新增 CrossEncoder Reranker（SentenceTransformers 后端）
+- [x] ~~**1.1.1**~~ 新增 CrossEncoder Reranker（SentenceTransformers 后端）
   - 来源：UltraRAG `servers/reranker/`
   - 代码：`backend/app/rag/reranker/` 新建目录，抽象 reranker 接口
   - 模型：BAAI/bge-reranker-base 或同级别
   - 现有 QwenReranker 保留作为备选
-- [ ] **1.1.2** Reranker 接口统一（多后端抽象）
+- [x] ~~**1.1.2**~~ Reranker 接口统一（多后端抽象）
   - 接口：`RerankerABC` + `RerankerRegistry`
   - 后端：CrossEncoder / Qwen CausalLM / Cloud API
   - 配置：YAML 指定默认后端 + fallback 链
 
-**完成时间**：____  **修改记录**：
+**完成时间**：2026-04-01  **修改记录**：
 
 | 日期 | 文件 | 说明 |
 |------|------|------|
-
----
+| 2026-04-01 | `backend/app/rag/reranker/base.py` | `BaseReranker` 抽象接口 |
+| 2026-04-01 | `backend/app/rag/reranker/cross_encoder.py` | CrossEncoder 后端 |
+| 2026-04-01 | `backend/app/rag/reranker/qwen_adapter.py` | Qwen 代码迁移 |
+| 2026-04-01 | `backend/app/rag/reranker/__init__.py` | 工厂 `create_reranker` |
+| 2026-04-01 | `backend/app/core/config.py` | 新增 `RERANKER_BACKEND`/`CROSS_ENCODER_MODEL`/`BATCH_SIZE` |
 
 ### 1.2 Web Search 多后端
 

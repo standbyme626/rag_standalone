@@ -4,6 +4,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence
 import json
+import re
+import random
+from collections import Counter
 
 
 _DEFAULT_RETRIEVAL_METRICS: tuple[str, ...] = ("mrr", "map", "ndcg", "recall@k")
@@ -252,4 +255,176 @@ def write_gate_report(
         "md_path": str(md_path),
         "status": payload.get("status"),
         "gate_passed": payload.get("gate_passed"),
+    }
+
+
+# ============================================================
+# 1.4.1 Generation Metrics: ROUGE / F1 / EM
+# ============================================================
+
+def _tokenize(text: str) -> List[str]:
+    """Unicode tokenization for ROUGE/F1/EM."""
+    return re.findall(r"\w+|[^\w\s]", text.lower(), re.UNICODE)
+
+
+def exact_match(prediction: str, reference: str) -> float:
+    return 1.0 if _tokenize(prediction) == _tokenize(reference) else 0.0
+
+
+def f1_score_tokens(prediction: str, reference: str) -> float:
+    """F1 of token overlap between prediction and reference."""
+    pred_tokens = _tokenize(prediction)
+    ref_tokens = _tokenize(reference)
+    if not pred_tokens or not ref_tokens:
+        return 0.0
+    pred_counts = Counter(pred_tokens)
+    ref_counts = Counter(ref_tokens)
+    overlap = sum((pred_counts & ref_counts).values())
+    precision = overlap / len(pred_tokens)
+    recall = overlap / len(ref_tokens)
+    if precision + recall == 0:
+        return 0.0
+    return 2 * precision * recall / (precision + recall)
+
+
+def _ngrams(tokens: List[str], n: int) -> List[tuple]:
+    return [tuple(tokens[i : i + n]) for i in range(len(tokens) - n + 1)]
+
+
+def rouge_n(prediction: str, reference: str, n: int = 1) -> float:
+    """ROUGE-N F1 score."""
+    pred_tokens = _tokenize(prediction)
+    ref_tokens = _tokenize(reference)
+    if not pred_tokens or not ref_tokens:
+        return 0.0
+    pred_ngrams = _ngrams(pred_tokens, n)
+    ref_ngrams = _ngrams(ref_tokens, n)
+    if not pred_ngrams or not ref_ngrams:
+        return 0.0
+    overlap = len(set(pred_ngrams) & set(ref_ngrams))
+    precision = overlap / len(pred_ngrams)
+    recall = overlap / len(ref_ngrams)
+    if precision + recall == 0:
+        return 0.0
+    return 2 * precision * recall / (precision + recall)
+
+
+def rouge_l(prediction: str, reference: str) -> float:
+    """ROUGE-L F1 score using LCS."""
+    pred_tokens = _tokenize(prediction)
+    ref_tokens = _tokenize(reference)
+    if not pred_tokens or not ref_tokens:
+        return 0.0
+
+    # LCS length
+    m, n_ = len(pred_tokens), len(ref_tokens)
+    # Use O(m*n) DP — fine for typical lengths
+    prev = [0] * (n_ + 1)
+    for i in range(m):
+        curr = [0] * (n_ + 1)
+        for j in range(n_):
+            if pred_tokens[i] == ref_tokens[j]:
+                curr[j + 1] = prev[j] + 1
+            else:
+                curr[j + 1] = max(prev[j + 1], curr[j])
+        prev = curr
+
+    lcs_len = prev[n_]
+    if lcs_len == 0:
+        return 0.0
+    precision = lcs_len / m
+    recall = lcs_len / n_
+    if precision + recall == 0:
+        return 0.0
+    return 2 * precision * recall / (precision + recall)
+
+
+def compute_generation_metrics(
+    predictions: List[str], references: List[str]
+) -> Dict[str, float]:
+    """计算所有生成指标。
+
+    Returns:
+        {"em": float, "f1": float, "rouge-1": float, "rouge-2": float, "rouge-l": float}
+    """
+    assert len(predictions) == len(references), (
+        f"len mismatch: {len(predictions)} vs {len(references)}"
+    )
+
+    em_scores: List[float] = []
+    f1_scores: List[float] = []
+    r1_scores: List[float] = []
+    r2_scores: List[float] = []
+    rl_scores: List[float] = []
+
+    for pred, ref in zip(predictions, references):
+        em_scores.append(exact_match(pred, ref))
+        f1_scores.append(f1_score_tokens(pred, ref))
+        r1_scores.append(rouge_n(pred, ref, n=1))
+        r2_scores.append(rouge_n(pred, ref, n=2))
+        rl_scores.append(rouge_l(pred, ref))
+
+    n = len(predictions) or 1
+    return {
+        "em": round(sum(em_scores) / n, 6),
+        "f1": round(sum(f1_scores) / n, 6),
+        "rouge-1": round(sum(r1_scores) / n, 6),
+        "rouge-2": round(sum(r2_scores) / n, 6),
+        "rouge-l": round(sum(rl_scores) / n, 6),
+    }
+
+
+# ============================================================
+# 1.4.3 P-Value Statistical Significance
+# ============================================================
+
+def permutation_test(
+    scores_a: List[float],
+    scores_b: List[float],
+    n_permutations: int = 10000,
+    seed: Optional[int] = None,
+) -> Dict[str, Any]:
+    """双尾置换检验
+
+    Args:
+        scores_a: 系统 A 每个样本的指标值
+        scores_b: 系统 B 对应样本的指标值
+        n_permutations: 置换次数
+
+    Returns:
+        {"A_mean", "B_mean", "Diff", "p_value", "significant", ...}
+    """
+    assert len(scores_a) == len(scores_b), (
+        f"length mismatch: {len(scores_a)} vs {len(scores_b)}"
+    )
+    n = len(scores_a)
+    if n == 0:
+        return {
+            "A_mean": 0.0, "B_mean": 0.0, "Diff": 0.0,
+            "p_value": 1.0, "significant": False,
+        }
+
+    rng = random.Random(seed)
+
+    mean_a = sum(scores_a) / n
+    mean_b = sum(scores_b) / n
+    obs_diff = mean_a - mean_b
+
+    pairs = list(zip(scores_a, scores_b))
+    extreme = 0
+
+    for _ in range(n_permutations):
+        perm_a_sum = sum(sb if rng.random() < 0.5 else sa for sa, sb in pairs)
+        perm_b_sum = sum((sum(sa + sb for sa, sb in pairs)) - perm_a_sum)
+        perm_diff = perm_a_sum / n - perm_b_sum / n
+        if abs(perm_diff) >= abs(obs_diff):
+            extreme += 1
+
+    p_value = (extreme + 1) / (n_permutations + 1)
+    return {
+        "A_mean": round(mean_a, 6),
+        "B_mean": round(mean_b, 6),
+        "Diff": round(obs_diff, 6),
+        "p_value": round(p_value, 6),
+        "significant": p_value < 0.05,
     }

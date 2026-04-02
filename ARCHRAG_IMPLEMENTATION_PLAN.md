@@ -319,11 +319,11 @@
 
 ### 4.1 Pipeline YAML 编排
 
-- [ ] **4.1.1** 定义 Pipeline YAML Schema
+- [x] ~~**4.1.1**~~ 定义 Pipeline YAML Schema
   - 来源：UltraRAG pipeline 格式
   - servers 映射（retriever/reranker/generation/evaluation）
   - pipeline 步骤列表（支持 loop / branch）
-- [ ] **4.1.2** 实现 Pipeline 执行器
+- [x] ~~**4.1.2**~~ 实现 Pipeline 执行器
   - 来源：UltraRAG `src/ultrarag/client.py` `UltraData` + `run()`
   - 内存系统（`memory_xxx`）
   - 变量依赖图自动提取
@@ -331,27 +331,32 @@
   - 逐步把 `MedicalRetriever.search_rag30()` 拆解为 Pipeline 步骤
   - 保留现有入口作为兼容模式
 
-**完成时间**：____  **修改记录**：
+**完成时间**：2026-04-02  **修改记录**：
 
 | 日期 | 文件 | 说明 |
 |------|------|------|
+| 2026-04-02 | `backend/app/rag/pipeline/pipeline.py` | PipelineExecutor + PipelineConfig + YAML 解析 |
+| 2026-04-02 | `backend/app/rag/pipeline/tool_registry.py` | ToolRegistry + ToolSpec + schema 推断 |
+| 2026-04-02 | `backend/app/rag/pipeline/retriever_tools.py` | 内置检索工具参考实现 |
+| 2026-04-02 | `backend/app/rag/pipeline/__init__.py` | 模块导出 |
+| 2026-04-02 | `backend/tests/test_pipeline.py` | 55 个新测试 |
 
 ---
 
 ### 4.2 MCP Server 生态
 
-- [ ] **4.2.1** 实现 ToolCall 统一路由
+- [x] ~~**4.2.1**~~ 实现 ToolCall 统一路由
   - 来源：UltraRAG `src/ultrarag/api.py` `_Router/_ServerProxy/_CallWrapper`
-- [ ] **4.2.2** 拆分 MCP Servers
+- [x] ~~**4.2.2**~~ 拆分 MCP Servers
   - Retriever Server / Reranker Server / Generation Server / Prompt Server / Evaluation Server
-- [ ] **4.2.3** Prompt 沙箱管理服务
+- [x] ~~**4.2.3**~~ Prompt 沙箱管理服务
   - 来源：UltraRAG `servers/prompt/src/prompt.py`
   - `SandboxedEnvironment` + `_safe_render()`
   - Jinja2 模板防 XSS
-- [ ] **4.2.4** server.yaml + parameter.yaml 配置热切换
+- [x] ~~**4.2.4**~~ server.yaml + parameter.yaml 配置热切换
   - 每个 server 独立配置目录
 
-**完成时间**：____  **修改记录**：
+**完成时间**：2026-04-01  **修改记录**：
 
 | 日期 | 文件 | 说明 |
 |------|------|------|
@@ -360,16 +365,18 @@
 
 ### 4.3 语料处理 Server
 
-- [ ] **4.3.1** 吸收 UltraRAG corpus server
+- [x] ~~**4.3.1**~~ 吸收 UltraRAG corpus server
   - 来源：UltraRAG `servers/corpus/src/corpus.py`
   - 多格式文本提取 / 图片语料 / MinerU 集成 / Chonkie 分块
-- [ ] **4.3.2** 安全文件处理 `_validate_path()`
+- [x] ~~**4.3.2**~~ 安全文件处理 `_validate_path()`
   - 路径穿越防护
 
-**完成时间**：____  **修改记录**：
+**完成时间**：2026-04-02  **修改记录**：
 
 | 日期 | 文件 | 说明 |
 |------|------|------|
+| 2026-04-02 | `backend/app/rag/corpus_server.py` | CorpusServer + validate_path + TextExtractor + chunk_corpus |
+| 2026-04-02 | `backend/tests/test_corpus_server.py` | 32 个新测试 |
 
 ---
 

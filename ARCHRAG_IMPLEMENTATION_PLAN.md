@@ -296,20 +296,22 @@
 
 ### 3.4 辅助能力
 
-- [ ] **3.4.1** 跨语言查询扩展
+- [x] ~~**3.4.1**~~ 跨语言查询扩展
   - 来源：ragflow `rag/prompts/cross_languages_*.md`
   - 翻译查询 → 多语言同时检索 → 合并结果
-- [ ] **3.4.2** 元数据过滤 LLM 提取
+- [x] ~~**3.4.2**~~ 元数据过滤 LLM 提取
   - 来源：ragflow `rag/prompts/meta_filter.md`
   - LLM 从查询提取 date/author/type → 检索层应用 filter
-- [ ] **3.4.3** Model Family Policy Engine
+- [x] ~~**3.4.3**~~ Model Family Policy Engine
   - 来源：ragflow `rag/llm/chat_model.py` `_apply_model_family_policies`
-  - 根据不同模型名自动调整参数（Qwen3/GPT-5/Kimi 等）
+  - 根据不同模型自动调整参数（Qwen3/GPT-5/Kimi 等）
 
-**完成时间**：____  **修改记录**：
+**完成时间**：2026-04-02  **修改记录**：
 
 | 日期 | 文件 | 说明 |
 |------|------|------|
+| 2026-04-02 | `backend/app/rag/query_enhance.py` | `QueryEnhancer` + `ModelFamilyPolicy` |
+| 2026-04-02 | `backend/tests/test_query_enhance.py` | 22 个新测试（跨语言/元数据过滤/模型策略） |
 
 ---
 
